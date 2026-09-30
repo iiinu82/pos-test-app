@@ -1,16 +1,54 @@
-# React + Vite
+🍔 Quick-POS-System 📱🍳📺
+ブラウザ完結で動作する、リアルタイム同期型の簡易POS（モバイルオーダー＆キッチンディスプレイ）システムです。 複雑な初期設定やサーバー構築が不要で、スマホからの注文からスタッフによる調理・お渡し、店頭ディスプレイでの呼び出しまでの一連の業務フローを遅延なく再現できます。 [https://rename-app-delta.vercel.app/]
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+🌟 主な特徴
+Firebaseによるリアルタイム同期
+Cloud Firestoreのリアルタイムリスナー（onSnapshot）を活用し、お客様のスマホ注文がお店のキッチン画面や店頭ディスプレイへラグなく即座に反映されます。
 
-Currently, two official plugins are available:
+3種の独立した画面ロール設計
+URLのパス（/, /kitchen, /display）で顧客用・スタッフ用・ディスプレイ用を綺麗に分離し、実際の店舗オペレーションに即したUIを実現。
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+商品ごとの完了チェック機能付きKDS
+スタッフ用画面では、注文内の商品ごとに「未/完成」をチェックでき、すべて完了しないと「準備OK」ボタンが押せない厳密なワークフローを構築。
 
-## React Compiler
+安心のローカル永続化（注文履歴保持）
+お客様側では、localStorageを活用してブラウザをリロードしても自分の直近の注文番号やステータスを確認できるように設計。
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+受渡完了時のタイマー演出付きアニメーション
+「受け渡し」ボタンを押すとステータスに応じた視覚的フィードバックが走り、実用性と心地よい操作性を両立。
 
-## Expanding the ESLint configuration
+🛠 画面・機能一覧
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+1. 顧客用画面（スマホ対応 / /）
+   メニュー選択 ＆ カート: A〜Dの豊富なメニューから直感的に選択。カートに追加する際は、サムネイルがフッターへスッと降りていくアニメーションを実装。
+   注文確認 ＆ 番号発行: 確認画面を経て注文を確定すると、自動で番号が発行され完了画面へ遷移。
+   注文履歴モーダル: localStorageを基に、今日発生した自分の注文番号と進行状況をいつでも見返せる履歴機能を搭載。
+
+2. キッチンスタッフ用画面（横画面・2ペイン / /kitchen）
+   未調理エリア（左側）: リアルタイムで届く注文カードを一覧表示。商品ごとの「未／完成」チェックや、誤爆を防ぐ確認アラート付き「キャンセル」機能を完備。
+   お渡し待ちエリア（右側）: 全商品が完了して「準備OK」になったオーダーが移動。受け渡し完了時のスムーズなフェードアウト演出を実装。
+   過去の履歴モーダル: 完了・キャンセルされた過去の注文履歴を、最新順にポップアップでサクッと確認可能。
+
+3. 店頭ディスプレイ画面（大型モニター想定 / /display）
+   お待ち番号 ＆ お呼出中番号: データベースのステータスに連動し、現在調理中の番号と、お呼び出し中の番号を左右対称の大文字でダイナミックに表示。
+
+   🚀 使い方
+   顧客として注文する
+   スマホ（またはPCのスマホ表示）で / にアクセスし、商品をカートに入れて「注文する」を押す。
+
+   キッチンで調理・準備OKを押す
+
+   /kitchen を開き、届いた注文の商品を「完成」にチェンジ。「準備OK」を押して右側に送る。
+
+   ディスプレイで呼び出しを確認する
+
+   /display を開き、右側に該当の番号が大きくお呼び出し中として表示されるのを確認する。
+
+   💻 開発環境 / 技術スタック
+   Frontend: React (Vite)
+   Styling: CSS Modules (キャメルケース命名によるコンポーネント独立設計)
+   Database & Realtime: Firebase Cloud Firestore (onSnapshot, addDoc, updateDoc)
+   Deployment: Vercel
+
+   📄 ライセンス
+   Copyright © 2026 T.Kawakatsu All Rights Reserved.
