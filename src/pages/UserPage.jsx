@@ -54,7 +54,11 @@ export default function UserPage() {
               <div className={styles.cardArea}>
                 {MENU_ITEMS.map((item) => (
                   <div className={styles.card} key={item.id}>
-                    <div className={styles.thumbnail}>{item.thumbnail}</div>
+                    <img
+                      src={item.thumbnail}
+                      alt={item.name}
+                      className={styles.thumbnail}
+                    />
                     <div className={styles.menuTitle}>{item.name}</div>
                     <button
                       className={styles.addCart}
@@ -88,9 +92,11 @@ export default function UserPage() {
             <div className={styles.confirmOrder}>
               {cart.map((item, index) => (
                 <div className={styles.confirmCard} key={index}>
-                  <div className={styles.confirmThumbnail}>
-                    {item.thumbnail}
-                  </div>
+                  <img
+                    src={item.thumbnail}
+                    alt={item.name}
+                    className={styles.confirmThumbnail}
+                  />
                   <div className={styles.confirmMenuTitle}>{item.name}</div>
                 </div>
               ))}

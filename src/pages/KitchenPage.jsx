@@ -135,7 +135,12 @@ export default function KitchenPage() {
                 <div className={styles.cardArea}>
                   {order.items.map((item, index) => (
                     <div className={styles.menuCard} key={index}>
-                      <div className={styles.thumbnail}>{item.thumbnail}</div>
+                      <img
+                        src={item.thumbnail}
+                        alt={item.name}
+                        className={styles.thumbnail}
+                      />
+
                       <div className={styles.menuName}>{item.name}</div>
                       <button
                         className={`${styles.menuStateBtn} ${
@@ -182,7 +187,11 @@ export default function KitchenPage() {
                 <div className={styles.cardArea}>
                   {order.items.map((item, index) => (
                     <div className={styles.menuCard} key={index}>
-                      <div className={styles.thumbnail}>{item.thumbnail}</div>
+                      <img
+                        src={item.thumbnail}
+                        alt={item.name}
+                        className={styles.thumbnail}
+                      />
                       <div className={styles.menuName}>{item.name}</div>
                     </div>
                   ))}
