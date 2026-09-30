@@ -9,10 +9,29 @@ export default function UserPage() {
   const [currentStep, setCurrentStep] = useState("select");
   const [cart, setCart] = useState([]);
   const [orderNumber, setOrderNumber] = useState(null);
+  const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
+  const [myHistory, setMyHistory] = useState([]);
+
+  const [flyingItemId, setFlyingItemId] = useState(null);
+
+  // 履歴を見る関数
+  const openHistoryModal = () => {
+    // 過去の履歴をローカルから取り出す
+    const savedHistory = JSON.parse(localStorage.getItem("myOrders") || "[]");
+    setMyHistory(savedHistory);
+    setIsHistoryModalOpen(true);
+  };
 
   // カートに入れる関数
   const handleAddToCart = (item) => {
     setCart([...cart, item]);
+
+    // カードの中にある画像タグを取得
+    setFlyingItemId(item.id);
+
+    setTimeout(() => {
+      setFlyingItemId(null);
+    }, 500);
   };
 
   // 注文完了する関数
@@ -34,7 +53,30 @@ export default function UserPage() {
 
       await addDoc(collection(db, "orders"), newOrder);
 
+      // ローカルに注文番号を保存
       setOrderNumber(newOrder.orderNumber);
+      const existingHistory = JSON.parse(
+        localStorage.getItem("myOrders") || "[]",
+      );
+
+      //「今日の0時0分0秒」の時刻を取得する
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0); // 時間・分・秒・ミリ秒をすべて0にする
+
+      // 既存の履歴から「今日（todayStart）以降のもの」だけをフィルタリングして残す
+      const todayHistory = existingHistory.filter((order) => {
+        const orderDate = new Date(order.createdAt);
+        return orderDate >= todayStart; // 今日作ったものだけ残す
+      });
+
+      const newHistory = [
+        {
+          orderNumber: newOrder.orderNumber,
+          createdAt: new Date().toISOString(),
+        },
+        ...todayHistory,
+      ];
+      localStorage.setItem("myOrders", JSON.stringify(newHistory));
 
       setCurrentStep("completed");
     } catch (e) {
@@ -49,7 +91,15 @@ export default function UserPage() {
         {/* ステップ1: 商品選択＝＞カートに入れる画面 */}
         {currentStep === "select" && (
           <>
-            <h1 className={styles.title}>新潟〇〇店でご注文</h1>
+            <div className={styles.header}>
+              <h1 className={styles.title}>新潟〇〇店でご注文</h1>
+              <button
+                onClick={openHistoryModal}
+                className={styles.historyOpenBtn}
+              >
+                注文履歴
+              </button>
+            </div>
             <div className={styles.menuArea}>
               <div className={styles.cardArea}>
                 {MENU_ITEMS.map((item) => (
@@ -66,6 +116,13 @@ export default function UserPage() {
                     >
                       カートに入れる
                     </button>
+                    {flyingItemId === item.id && (
+                      <img
+                        src={item.thumbnail}
+                        alt="flying"
+                        className={styles.flyingThumbnail}
+                      />
+                    )}
                   </div>
                 ))}
               </div>
@@ -131,6 +188,43 @@ export default function UserPage() {
           </>
         )}
       </div>
+
+      {/* 自分の注文履歴モーダル */}
+      {isHistoryModalOpen && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modalContent}>
+            <div className={styles.modalHeader}>
+              <h3 className={styles.modalTitle}>ご自身の注文履歴</h3>
+              <button
+                className={styles.closeBtn}
+                onClick={() => setIsHistoryModalOpen(false)}
+              >
+                ✕
+              </button>
+            </div>
+            <div className={styles.modalBody}>
+              {myHistory.length === 0 ? (
+                <p className={styles.noHistory}>過去の注文履歴はありません</p>
+              ) : (
+                myHistory.map((order, index) => (
+                  <div className={styles.historyCard} key={index}>
+                    <span className={styles.historyNum}>
+                      #{order.orderNumber}
+                    </span>
+                    <span className={styles.historyTime}>
+                      {new Date(order.createdAt).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}{" "}
+                      注文
+                    </span>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
